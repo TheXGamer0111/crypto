@@ -1,0 +1,84 @@
+/target
+# Environment variables
+.env
+
+# Database
+blockchain_data/
+storage/
+# Ignore build artifacts
+/target/
+
+# Ignore Rust's Cargo.lock file for libraries
+Cargo.lock
+
+# Ignore IDE files
+.idea/
+.vscode/
+
+# Ignore database files
+blockchain_data/
+
+  # Ignore node_modules directory
+  node_modules/
+
+  # Ignore log files
+  *.log
+
+  # Ignore compiled files
+  *.o
+  *.exe
+
+  # Ignore database files
+  blockchain_data/
+# Build artifacts
+/target
+**/*.rs.bk
+
+# IDE files
+.idea/
+.vscode/
+
+# Database files
+blockchain_data/
+blockchain_data/*
+**/blockchain_data/
+
+# Ignore Actix and Bincode generated files
+build-script-build-script-build
+build-script-build-script-build.json
+dep-build-script-build-script-build
+dep-lib-bindgen
+invoked.timestamp
+lib-bindgen
+dep-lib-bzip2
+lib-bindgen.json
+lib-bzip2.json
+lib-bzip2_sys
+lib-bzip2_sys.json
+/lib-actix_http
+/dep-lib-actix_http
+/lib-actix_web
+/dep-lib-bincode
+/lib-bindgen
+/dep-lib-bindgen
+/lib-bzip2
+/dep-lib-bzip2
+
+# ignore generated files
+*.json
+
+# ignore dependency files
+.d
+
+
+# ignore program database files
+*.pdb
+*.lib
+*.rlib
+*.a
+
+# Ignore build script files
+build-script-*
+build-script-build-*
+build_script_*
+build_script_build-*
