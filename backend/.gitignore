@@ -7,6 +7,8 @@ blockchain_data/
 storage/
 # Ignore build artifacts
 /target/
+/contract_state
+/contract_state/*
 
 # Ignore Rust's Cargo.lock file for libraries
 Cargo.lock

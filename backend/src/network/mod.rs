@@ -16,7 +16,10 @@ impl Network {
     }
 
     pub async fn start_server(&self) -> io::Result<()> {
-        let listener = TcpListener::bind("127.0.0.1:8080").await?;
+        let address = "127.0.0.1:8080";
+        let listener = TcpListener::bind(address).await?;
+        println!("Starting P2P server on {}", address);
+
         loop {
             let (socket, _) = listener.accept().await?;
             let peers = self.peers.clone();

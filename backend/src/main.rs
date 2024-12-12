@@ -22,7 +22,6 @@ use blockchain_project::storage::Storage;
 
 fn main() {
     std::env::set_var("RUST_BACKTRACE", "1");
-    // Create a new Tokio runtime
     let rt = Runtime::new().unwrap();
 
     println!("Starting the blockchain project...");
@@ -55,48 +54,23 @@ fn main() {
     println!("Is blockchain valid? {}", blockchain.is_chain_valid());
 
     // Initialize the network
-    let network = Network::new();
+    let network = Arc::new(Network::new());
 
-    // Initialize metrics
-    let registry = Arc::new(Registry::new());
-    let metrics = Metrics::new();
-    metrics.register(&registry);
-
-    // Start the network server
+    // Start the P2P server
+    let network_clone = Arc::clone(&network);
     rt.spawn(async move {
-        println!("Starting network server...");
-        if let Err(e) = network.start_server().await {
-            eprintln!("Network server error: {:?}", e);
+        if let Err(e) = network_clone.start_server().await {
+            eprintln!("P2P server error: {:?}", e);
         }
     });
 
     // Start the API server
-    start_api();
-
-    // Start the metrics server
-    rt.spawn(async move {
-        println!("Starting metrics server...");
-        serve_metrics(registry.clone()).await;
+    rt.block_on(async {
+        start_api(network.clone()).await;
     });
 
     // Block the main thread until the runtime is shut down
     rt.block_on(async {
-        // You can add additional async tasks here if needed
         println!("All services are running.");
     });
-
-    let storage = Arc::new(Storage::new("contract_state"));
-
-    let deploy_contract = warp::path("deploy")
-        .and(warp::post())
-        .and(warp::body::json())
-        .and(warp::any().map(move || Arc::clone(&storage)))
-        .map(|code: String, storage: Arc<Storage>| {
-            let contract = SmartContract::new(code);
-            contract.save_state(&storage, "contract_id");
-            warp::reply::json(&"Contract deployed")
-        });
-
-    let routes = deploy_contract;
-    warp::serve(routes).run(([127, 0, 0, 1], 3030));
 } 
