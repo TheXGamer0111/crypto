@@ -36,7 +36,22 @@ impl Network {
     }
 
     pub fn discover_peers(&self) {
-        // Implement peer discovery logic
+        let peers = self.peers.lock().unwrap().clone();
+        for peer in peers.iter() {
+            // Simulate a request to each peer to get their peer list
+            println!("Requesting peer list from {}", peer);
+            // Here you would implement actual network requests to peers
+            // For simplicity, we'll just print the action
+        }
+    }
+
+    pub fn broadcast_message(&self, message: &str) {
+        let peers = self.peers.lock().unwrap().clone();
+        for peer in peers.iter() {
+            // Simulate sending a message to each peer
+            println!("Broadcasting message to {}: {}", peer, message);
+            // Here you would implement actual network communication
+        }
     }
 
     pub fn synchronize(&self) {

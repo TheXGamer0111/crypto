@@ -24,7 +24,8 @@ impl SmartContract {
     }
 
     pub fn execute(&mut self, function_name: &str, params: &[i32]) -> Result<i32, Box<dyn Error>> {
-        // Simple execution logic based on function name
+        let mut vm = VirtualMachine::new(1000); // Set a default gas limit
+        vm.execute_with_gas(&self.code, params, 1000)?;
         match function_name {
             "add" => Ok(params.iter().sum()),
             "multiply" => Ok(params.iter().product()),

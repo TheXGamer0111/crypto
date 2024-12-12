@@ -25,6 +25,8 @@ mod tests {
             receiver: "Bob".to_string(),
             amount: 50,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
         });
 
@@ -40,6 +42,8 @@ mod tests {
             receiver: "Bob".to_string(),
             amount: 50,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
         };
         pool.add_transaction(transaction.clone());
@@ -64,6 +68,8 @@ mod tests {
             receiver: "Bob".to_string(),
             amount: 50,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
         });
 
@@ -82,20 +88,34 @@ mod tests {
         blockchain.balances.insert("Alice".to_string(), 100);
         blockchain.balances.insert("Charlie".to_string(), 100);
 
-        blockchain.add_transaction(Transaction {
+        let rng = SystemRandom::new();
+        let keypair = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();
+        let keypair = Ed25519KeyPair::from_pkcs8(keypair.as_ref()).unwrap();
+
+        let mut transaction1 = Transaction {
             sender: "Alice".to_string(),
             receiver: "Bob".to_string(),
             amount: 50,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
-        });
-        blockchain.add_transaction(Transaction {
+        };
+        transaction1.sign(&keypair);
+
+        let mut transaction2 = Transaction {
             sender: "Charlie".to_string(),
             receiver: "Dave".to_string(),
             amount: 30,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
-        });
+        };
+        transaction2.sign(&keypair);
+
+        blockchain.add_transaction(transaction1);
+        blockchain.add_transaction(transaction2);
         blockchain.add_block(true);
 
         let transactions: Vec<Transaction> = serde_json::from_str(&blockchain.chain[1].data).unwrap();
@@ -108,7 +128,7 @@ mod tests {
         let keypair = Ed25519KeyPair::generate_pkcs8(&rng).unwrap();
         let keypair = Ed25519KeyPair::from_pkcs8(keypair.as_ref()).unwrap();
 
-        let mut transaction = Transaction::new("Alice".to_string(), "Bob".to_string(), 50, 1);
+        let mut transaction = Transaction::new("Alice".to_string(), "Bob".to_string(), 50, 1, 1);
         transaction.sign(&keypair);
 
         assert!(transaction.verify(keypair.public_key().as_ref()));
@@ -124,6 +144,8 @@ mod tests {
             receiver: "Bob".to_string(),
             amount: 50,
             fee: 1,
+            nonce: 1,
+            required_signatures: 1,
             signatures: Vec::new(),
         };
 

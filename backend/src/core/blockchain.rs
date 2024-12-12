@@ -58,7 +58,7 @@ impl Blockchain {
     }
 
     pub fn add_transaction(&mut self, transaction: Transaction) {
-        if self.validate_transaction(&transaction) {
+        if self.validate_transaction(&transaction) && transaction.is_fully_signed() {
             println!("Adding transaction: {:?}", transaction);
             self.transaction_pool.add_transaction(transaction);
         } else {
@@ -69,8 +69,22 @@ impl Blockchain {
     pub fn validate_transaction(&self, transaction: &Transaction) -> bool {
         let sender_balance = self.balances.get(&transaction.sender).cloned().unwrap_or(0);
         let is_valid = sender_balance >= transaction.amount + transaction.fee;
-        println!("Validating transaction: {:?}, Sender balance: {}, Is valid: {}", transaction, sender_balance, is_valid);
-        is_valid
+
+        // Check for replay protection using nonce
+        let sender_nonce = self.get_nonce(&transaction.sender);
+        let is_replay_protected = transaction.nonce > sender_nonce;
+
+        println!(
+            "Validating transaction: {:?}, Sender balance: {}, Is valid: {}, Is replay protected: {}",
+            transaction, sender_balance, is_valid, is_replay_protected
+        );
+
+        is_valid && is_replay_protected
+    }
+
+    fn get_nonce(&self, address: &str) -> u64 {
+        // Implement logic to retrieve the current nonce for the address
+        0 // Placeholder
     }
 
     pub fn update_balances(&mut self) {
@@ -112,7 +126,7 @@ impl Blockchain {
     }
 
     pub fn execute_contract(&mut self, contract: &mut SmartContract, function_name: &str, params: &[i32]) -> Result<i32, Box<dyn std::error::Error>> {
-        let mut vm = VirtualMachine::new();
+        let mut vm = VirtualMachine::new(1000);
         vm.execute(&contract.code, params)?;
         contract.execute(function_name, params)
     }

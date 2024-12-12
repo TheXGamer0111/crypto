@@ -9,18 +9,22 @@ pub struct Transaction {
     pub receiver: String,
     pub amount: u64,
     pub fee: u64,
+    pub nonce: u64,
     #[serde(skip)]
     pub signatures: Vec<Signature>,
+    pub required_signatures: usize,
 }
 
 impl Transaction {
-    pub fn new(sender: String, receiver: String, amount: u64, fee: u64) -> Self {
+    pub fn new(sender: String, receiver: String, amount: u64, fee: u64, required_signatures: usize) -> Self {
         Transaction {
             sender,
             receiver,
             amount,
             fee,
+            nonce: 0,
             signatures: Vec::new(),
+            required_signatures,
         }
     }
 
@@ -64,8 +68,8 @@ impl Transaction {
         self.verify_signatures(public_keys)
     }
 
-    pub fn is_fully_signed(&self, required_signatures: usize) -> bool {
-        self.signatures.len() >= required_signatures
+    pub fn is_fully_signed(&self) -> bool {
+        self.signatures.len() >= self.required_signatures
     }
 }
 

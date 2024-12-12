@@ -60,7 +60,7 @@ pub async fn start_api(network: Arc<Network>) {
     let send_transaction = warp::path("send_transaction")
         .and(warp::body::json())
         .map(|tx: Transaction| {
-            // Here you'd process the transaction
+            // Here you'd process the transaction, ensuring it meets multi-signature and replay protection requirements
             warp::reply::json(&tx)
         });
 
@@ -123,14 +123,15 @@ pub async fn start_api(network: Arc<Network>) {
             }
         });
 
-    // Synchronize endpoint
-    let synchronize = warp::path("synchronize")
-        .and(warp::get())
+    // Broadcast message endpoint
+    let broadcast_message = warp::path("broadcast_message")
+        .and(warp::post())
+        .and(warp::body::json())
         .map({
             let network = Arc::clone(&network);
-            move || {
-                network.synchronize();
-                warp::reply::json(&"Synchronization started")
+            move |message: String| {
+                network.broadcast_message(&message);
+                warp::reply::json(&"Message broadcasted")
             }
         });
 
@@ -144,7 +145,7 @@ pub async fn start_api(network: Arc<Network>) {
         .or(get_transactions)
         .or(add_peer)
         .or(discover_peers)
-        .or(synchronize);
+        .or(broadcast_message);
 
     // Start the server
     println!("Starting API server on http://127.0.0.1:3030");

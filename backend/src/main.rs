@@ -38,6 +38,8 @@ fn main() {
         receiver: "Bob".to_string(),
         amount: 50,
         fee: 1,
+        nonce: 1,
+        required_signatures: 1,
         signatures: Vec::new(),
     });
 
